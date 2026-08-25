@@ -31,30 +31,60 @@ export class UnitSelector extends LitElement {
         >
           <button
             type="button"
-            class=${this.unit === 'celsius'
+            class="${this.unit === 'celsius'
               ? 'unit-selector__button unit-selector__button--active'
-              : 'unit-selector__button'}
+              : 'unit-selector__button'}"
             data-unit="celsius"
-            aria-pressed=${this.unit === 'celsius' ? 'true' : 'false'}
-            ?disabled=${this.disabled}
+            aria-pressed="${this.unit === 'celsius' ? 'true' : 'false'}"
+            ?disabled="${this.disabled}"
+            @click="${this._selectUnit}"
           >
             °C
           </button>
 
           <button
             type="button"
-            class=${this.unit === 'fahrenheit'
+            class="${this.unit === 'fahrenheit'
               ? 'unit-selector__button unit-selector__button--active'
-              : 'unit-selector__button'}
+              : 'unit-selector__button'}"
             data-unit="fahrenheit"
-            aria-pressed=${this.unit === 'fahrenheit' ? 'true' : 'false'}
-            ?disabled=${this.disabled}
+            aria-pressed="${this.unit === 'fahrenheit' ? 'true' : 'false'}"
+            ?disabled="${this.disabled}"
+            @click="${this._selectUnit}"
           >
             °F
           </button>
         </div>
       </section>
     `;
+  }
+
+  _selectUnit(event) {
+    if (this.disabled) {
+      return;
+    }
+
+    const nextUnit = event.currentTarget.dataset.unit;
+
+    const validUnits = ['celsius', 'fahrenheit'];
+
+    if (!validUnits.includes(nextUnit)) {
+      return;
+    }
+
+    if (nextUnit === this.unit) {
+      return;
+    }
+
+    this.dispatchEvent(
+      new CustomEvent('unit-change', {
+        detail: {
+          unit: nextUnit
+        },
+        bubbles: true,
+        composed: true
+      })
+    );
   }
 }
 
