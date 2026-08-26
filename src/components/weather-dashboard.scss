@@ -1,0 +1,80 @@
+:host {
+  display: block;
+  color: #17324d;
+}
+
+.dashboard {
+  max-width: 58rem;
+  margin: 0 auto;
+  padding: 2rem;
+  border: 1px solid #b8d8d8;
+  border-radius: 1rem;
+  background: #f5fbf9;
+  box-shadow: 0 1rem 2.5rem rgb(23 50 77 / 0.12);
+}
+
+.dashboard__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.dashboard__eyebrow {
+  margin: 0 0 0.5rem;
+  color: #237b79;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0;
+  color: #17324d;
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 0.95;
+}
+
+.dashboard__header p:last-child {
+  margin: 0.75rem 0 0;
+  color: #527080;
+}
+
+.dashboard__status {
+  min-height: 3rem;
+  margin-top: 1.5rem;
+}
+
+.status,
+.selected-city {
+  margin: 0;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background: #e4f1ef;
+}
+
+.status--loading {
+  color: #237b79;
+}
+
+.status--error {
+  color: #a53d32;
+  background: #fbe9e5;
+}
+
+.selected-city {
+  font-weight: 700;
+}
+
+@media (max-width: 38rem) {
+  .dashboard {
+    padding: 1.25rem;
+  }
+
+  .dashboard__header {
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+}
