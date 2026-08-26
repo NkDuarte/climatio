@@ -2,6 +2,8 @@ import { LitElement, html, unsafeCSS } from 'lit';
 import { loadWeatherForCity } from '../services/open-meteo.js';
 import './city-search/city-search.js';
 import './unit-selector/unit-selector.js';
+import './current-weather/current-weather.js'; // faltaba el import de clima actual
+import './forecast-strip/forecast-strip.js'; // faltaba el import d pronóstico
 import styles from './weather-dashboard.scss?inline';
 
 export class WeatherDashboard extends LitElement {
@@ -44,8 +46,9 @@ export class WeatherDashboard extends LitElement {
             <h1>ClimaVivo</h1>
             <p>Consulta el cielo de cualquier ciudad.</p>
           </div>
+
           <unit-selector
-            unit=${this.unit}
+            .unit=${this.unit}
             ?disabled=${this._isLoading}
           ></unit-selector>
         </header>
@@ -57,27 +60,70 @@ export class WeatherDashboard extends LitElement {
 
         <div class="dashboard__status" aria-live="polite">
           ${this._isLoading
-            ? html`<p class="status status--loading">Cargando información meteorológica...</p>`
+            ? html`
+                <p class="status status--loading">
+                  Cargando información meteorológica...
+                </p>
+              `
             : ''}
+
           ${this._error
-            ? html`<p class="status status--error" role="alert">${this._error}</p>`
+            ? html`
+                <p class="status status--error" role="alert">
+                  ${this._error}
+                </p>
+              `
             : ''}
+
           ${!this._isLoading && !this._error && !this._selectedCity
-            ? html`<p class="status">Busca una ciudad para consultar su pronóstico.</p>`
+            ? html`
+                <p class="status">
+                  Busca una ciudad para consultar su pronóstico.
+                </p>
+              `
             : ''}
         </div>
 
         ${this._selectedCity
           ? html`
-              <section class="selected-city">
-                <p>Pronóstico para ${this._selectedCity.label}</p>
+              <!--
+                ¿Q cambié? Sólo la integración de componentes faltantes. 
+
+                weather-dashboard sigue siendo dueño de:
+                - fetch;
+                - AbortController;
+                - estado global;
+                - ciudad seleccionada;
+                - clima actual;
+                - pronóstico.
+
+                Los componentes hijos solo reciben propiedades normalizadas
+                y se encargan de mostrar la información.
+              -->
+              <section
+                class="dashboard__weather"
+                aria-label="Información meteorológica"
+              >
                 ${this._currentWeather
                   ? html`
-                      <p>
-                        ${this._currentWeather.temperature}° · ${this._currentWeather.condition}
-                      </p>
+                      <current-weather
+                        .city=${this._selectedCity}
+                        .weather=${this._currentWeather}
+                        .unit=${this.unit}
+                        ?disabled=${this._isLoading}
+                      ></current-weather>
                     `
                   : ''}
+
+                <!--
+                  forecast-strip recibe el array normalizado _forecast
+                  Ahora ese componente usa forecast.map(...) internamente para
+                  renderizar una tarjeta en teoria x cada día del pronóstico
+                -->
+                <forecast-strip
+                  .forecast=${this._forecast}
+                  .unit=${this.unit}
+                ></forecast-strip>
               </section>
             `
           : ''}
