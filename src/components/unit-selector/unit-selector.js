@@ -2,19 +2,19 @@ import { LitElement, html, unsafeCSS } from 'lit';
 import styles from './unit-selector.scss?inline';
 
 /**
- * Unidades de temperatura permitidas en ClimaVivo.
+ * Unidades de temperatura para la app
  *
  * @typedef {'celsius' | 'fahrenheit'} TemperatureUnit
  */
 
 /**
- * Evento público emitido cuando la persona selecciona una unidad diferente.
+ * Este es el evento público emitido cuando la persona selecciona una unidad diferente
  *
  * @typedef {CustomEvent<{ unit: TemperatureUnit }>} UnitChangeEvent
  */
 
 /**
- * Selector visual de unidades de temperatura.
+ * Selector visual de unidades de temperatura
  *
  * Este componente es controlado por <weather-dashboard>:
  *
@@ -50,7 +50,7 @@ export class UnitSelector extends LitElement {
     super();
 
     /**
-     * Unidad seleccionada actualmente.
+     * Unidad seleccionada actualmente o por default
      *
      * @type {TemperatureUnit}
      */
