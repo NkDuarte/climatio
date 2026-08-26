@@ -1,10 +1,21 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import './unit-selector.js';
 
+/**
+ * Limpia el DOM simulado después de cada prueba.
+ *
+ * Evita que una instancia de <unit-selector> afecte la siguiente prueba.
+ */
 afterEach(() => {
   document.body.innerHTML = '';
 });
 
+/**
+ * Pruebas del contrato público de <unit-selector>.
+ *
+ * Se prueban eventos y comportamiento visible.
+ * No se invocan métodos privados como _selectUnit() directamente.
+ */
 describe('unit-selector', () => {
   it('emite unit-change con la unidad seleccionada', async () => {
     const selector = document.createElement('unit-selector');
@@ -13,6 +24,10 @@ describe('unit-selector', () => {
 
     document.body.append(selector);
 
+    /**
+     * Lit actualiza el DOM de forma asíncrona.
+     * updateComplete espera a que el template esté listo.
+     */
     await selector.updateComplete;
 
     const eventPromise = new Promise((resolve) => {
