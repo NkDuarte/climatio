@@ -51,5 +51,8 @@ describe('forecast-strip', () => {
     expect(days.length).toBe(2);
     expect(component.shadowRoot.textContent).toContain('Lluvia ligera');
     expect(component.shadowRoot.textContent).toContain('Nublado');
+    expect(days[0].style.getPropertyValue('--forecast-index')).toBe('0');
+    expect(days[1].style.getPropertyValue('--forecast-index')).toBe('1');
+    expect(days[0].querySelectorAll('.forecast-strip__rain span')).toHaveLength(3);
   });
 });

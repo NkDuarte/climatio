@@ -1,0 +1,73 @@
+:root {
+  color-scheme: dark;
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+  font-synthesis: none;
+  background: #071523;
+  color: #eef6ff;
+  --surface: #0c2032;
+  --surface-raised: #102a40;
+  --surface-subtle: #082033;
+  --line: #28465c;
+  --line-strong: #3d6480;
+  --text: #eef6ff;
+  --muted: #8fa7ba;
+  --accent: #78c8ff;
+  --accent-strong: #2186d1;
+  --accent-soft: #143d5d;
+  --danger: #ff7078;
+  --danger-surface: #501d29;
+  --focus: #ffe27a;
+}
+
+html {
+  min-width: 20rem;
+  overflow-x: clip;
+  background: #071523;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background-color: #071523;
+  background-image: radial-gradient(rgb(133 176 204 / 0.3) 1px, transparent 1px);
+  background-size: 1rem 1rem;
+  scrollbar-color: #39789f #071523;
+  scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+  width: 0.75rem;
+}
+
+::-webkit-scrollbar-track {
+  border-left: 1px solid #17354a;
+  background: #071523;
+}
+
+::-webkit-scrollbar-thumb {
+  border: 0.2rem solid #071523;
+  border-radius: 99rem;
+  background: linear-gradient(#5aa8d5, #286f9c);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(#87caf0, #3f91c3);
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+#app {
+  min-height: 100vh;
+  overflow: clip;
+}

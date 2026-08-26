@@ -12,8 +12,7 @@
     "happy-dom": "^20.11.6",
     "sass-embedded": "^1.103.1",
     "vite": "^8.2.1",
-    "vitest": "^3.2.4",
-    "happy-dom": "^18.0.1"
+    "vitest": "^3.2.4"
   },
   "dependencies": {
     "lit": "^3.3.3"

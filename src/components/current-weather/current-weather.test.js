@@ -73,6 +73,8 @@ describe('current-weather', () => {
     expect(component.shadowRoot.textContent).toContain('16°C');
     expect(component.shadowRoot.textContent).toContain('78%');
     expect(component.shadowRoot.textContent).toContain('11 km/h');
+    expect(component.shadowRoot.querySelectorAll('.current-weather__cloud')).toHaveLength(2);
+    expect(component.shadowRoot.querySelectorAll('.current-weather__rain span')).toHaveLength(4);
   });
 
   it('emite favorite-toggle con la ciudad actual', async () => {
