@@ -2,7 +2,7 @@ import { LitElement, html, unsafeCSS } from 'lit';
 import styles from './current-weather.scss?inline';
 
 /**
- * Representa una ciudad normalizada para mostrar información meteorológica.
+ * Representa una ciudad pra mostrar información meteorológica
  *
  * El dashboard recibe datos crudos de Open-Meteo, los normaliza y pasa un
  * objeto con esta forma a <current-weather>.
@@ -18,17 +18,17 @@ import styles from './current-weather.scss?inline';
 /**
  * Representa el clima actual normalizado.
  *
- * Este componente no debe depender de la respuesta cruda de Open-Meteo.
+ * Este componente no debe depender de la respuesta de Open-Meteo.
  * Recibe un objeto simplificado y consistente desde <weather-dashboard>.
  *
  * @typedef {Object} CurrentWeatherData
- * @property {number} temperature Temperatura actual en la unidad seleccionada.
- * @property {number} apparentTemperature Sensación térmica.
- * @property {number} humidity Humedad relativa, expresada como porcentaje.
- * @property {number} windSpeed Velocidad del viento en km/h.
- * @property {string} condition Descripción legible del clima.
- * @property {string} iconKey Clave visual para elegir el icono CSS.
- * @property {boolean} isDay Indica si la condición corresponde al día.
+ * @property {number} temperature Temperatura actual en la unidad seleccionada
+ * @property {number} apparentTemperature Sensación térmica
+ * @property {number} humidity Humedad relativa, expresada enn porcentaje
+ * @property {number} windSpeed Velocidad del viento en km/h
+ * @property {string} condition Descripción legible del clima
+ * @property {string} iconKey Clave visual para elegir el icono CSS
+ * @property {boolean} isDay Indica si la condición corresponde al día
  */
 
 /**
@@ -114,7 +114,7 @@ export class CurrentWeather extends LitElement {
     /**
      * Indica si el botón de favoritos debe permanecer deshabilitado.
      *
-     * Por ejemplo, el dashboard podría deshabilitarlo durante una carga.
+     * x ejemplo, el dashboard podría deshabilitarlo durante una carga.
      *
      * @type {boolean}
      */
@@ -222,7 +222,7 @@ export class CurrentWeather extends LitElement {
   }
 
   /**
-   * Renderiza el estado vacío o la tarjeta de clima actual.
+   * Renderiza el estado vacío o la tarjeta de clima actual
    *
    * @returns {import('lit').TemplateResult} Template reactivo de Lit.
    */

@@ -30,9 +30,9 @@ const weather = {
 };
 
 /**
- * Limpia el DOM simulado después de cada prueba.
+ * Limpia el DOM simulado después de cada prueba q se haga
  *
- * Evita que una instancia creada por una prueba afecte la siguiente.
+ * Evita que una instancia creada por una prueba afecte la siguiente
  */
 afterEach(() => {
   document.body.innerHTML = '';
@@ -42,7 +42,7 @@ afterEach(() => {
  * Pruebas públicas de <current-weather>.
  *
  * No se prueban métodos privados como _handleFavoriteToggle().
- * En su lugar, se simula el clic real sobre el botón, como lo haría una persona.
+ * En su lugar, se simula el click real sobre el botón, como lo podría hacer una persona 
  */
 describe('current-weather', () => {
   it('muestra los datos meteorológicos recibidos', async () => {
@@ -56,7 +56,7 @@ describe('current-weather', () => {
 
     /**
      * Lit actualiza el DOM de forma asíncrona.
-     * updateComplete espera hasta que el template ya se haya renderizado.
+     * updateComplete espera hasta que el template ya se haya renderizado
      */
     await component.updateComplete;
 
@@ -89,7 +89,7 @@ describe('current-weather', () => {
      * Espera el evento público favorite-toggle.
      *
      * `once: true` elimina automáticamente el listener después de recibir
-     * el primer evento, evitando listeners innecesarios entre pruebas.
+     * el primer evento, evitando la duplicación d listeners  o listenners innecesarios entre pruebas
      */
     const eventPromise = new Promise((resolve) => {
       component.addEventListener('favorite-toggle', resolve, {
@@ -98,9 +98,9 @@ describe('current-weather', () => {
     });
 
     /**
-     * Se busca el botón dentro del Shadow DOM y se hace clic real.
+     * Se busca el botón dentro del Shadow DOM y se hace click d vdd
      *
-     * Esto prueba el contrato público del componente, no sus métodos privados.
+     * Esto prueba el contrato público del componente ( x ahora no va a probar sus métodos privados) 
      */
     const favoriteButton = component.shadowRoot.querySelector(
       '.current-weather__favorite'
