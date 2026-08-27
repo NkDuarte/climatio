@@ -34,12 +34,24 @@ export class WeatherDashboard extends LitElement {
   }
 
   render() {
+    const weatherScene = this._getWeatherScene();
+
     return html`
       <section
-        class="dashboard"
+        class="dashboard dashboard--${weatherScene}"
         @city-search=${this._handleCitySearch}
         @unit-change=${this._handleUnitChange}
       >
+        <div class="dashboard__atmosphere" aria-hidden="true">
+          <span class="dashboard__sun"></span>
+          <span class="dashboard__moon"></span>
+          <span class="dashboard__cloud dashboard__cloud--one"></span>
+          <span class="dashboard__cloud dashboard__cloud--two"></span>
+          <span class="dashboard__rain"></span>
+          <span class="dashboard__snow"></span>
+          <span class="dashboard__lightning"></span>
+        </div>
+
         <header class="dashboard__header">
           <div>
             <p class="dashboard__eyebrow">Open-Meteo · pronóstico público</p>
@@ -134,6 +146,40 @@ export class WeatherDashboard extends LitElement {
   _handleCitySearch(event) {
     this.city = event.detail.query;
     this._loadWeather(event.detail.query);
+  }
+
+  _getWeatherScene() {
+    const iconKey = this._currentWeather?.iconKey;
+
+    if (iconKey === 'clear-day') {
+      return 'clear-day';
+    }
+
+    if (iconKey === 'clear-night' || this._currentWeather?.isDay === false) {
+      return 'clear-night';
+    }
+
+    if (iconKey === 'rain' || iconKey === 'drizzle') {
+      return 'rain';
+    }
+
+    if (iconKey === 'thunderstorm') {
+      return 'thunderstorm';
+    }
+
+    if (iconKey === 'snow') {
+      return 'snow';
+    }
+
+    if (iconKey === 'fog') {
+      return 'fog';
+    }
+
+    if (iconKey === 'cloudy' || iconKey?.startsWith('partly-cloudy')) {
+      return 'cloudy';
+    }
+
+    return 'default';
   }
 
   _handleUnitChange(event) {

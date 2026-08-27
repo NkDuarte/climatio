@@ -62,9 +62,12 @@ export class ForecastStrip extends LitElement {
    * @param {ForecastDay} day Día normalizado.
    * @returns {import('lit').TemplateResult} Template del día.
    */
-  _renderDay(day) {
+  _renderDay(day, index) {
     return html`
-      <article class="forecast-strip__day">
+      <article
+        class="forecast-strip__day"
+        style="--forecast-index: ${index}"
+      >
         <h3>${day.label}</h3>
 
         <div
@@ -72,7 +75,15 @@ export class ForecastStrip extends LitElement {
           role="img"
           aria-label="${day.condition}"
         >
-          <span></span>
+          <span class="forecast-strip__sun" aria-hidden="true"></span>
+          <span class="forecast-strip__cloud" aria-hidden="true"></span>
+          <span class="forecast-strip__rain" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </span>
+          <span class="forecast-strip__snow" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </span>
+          <span class="forecast-strip__bolt" aria-hidden="true"></span>
         </div>
 
         <p class="forecast-strip__condition">${day.condition}</p>
@@ -105,7 +116,7 @@ export class ForecastStrip extends LitElement {
             `
           : html`
               <div class="forecast-strip__list">
-                ${this.forecast.map((day) => this._renderDay(day))}
+                ${this.forecast.map((day, index) => this._renderDay(day, index))}
               </div>
             `}
       </section>
