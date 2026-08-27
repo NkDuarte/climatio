@@ -293,7 +293,7 @@ export class CurrentWeather extends LitElement {
 
         <dl class="current-weather__details">
           <div>
-            <dt>Sensación</dt>
+            <dt>Sensación </dt>
             <dd>
               ${this._formatTemperature(this.weather.apparentTemperature)}
             </dd>
