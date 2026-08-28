@@ -2,37 +2,37 @@ import { LitElement, html, unsafeCSS } from 'lit';
 import styles from './saved-cities.scss?inline';
 
 /**
- * Ciudad guardada dentro de ClimaVivo.
+ * Para guardar dentro de ciudad:
  *
  * @typedef {object} SavedCity
- * @property {string} id Identificador único entregado por el geocodificador.
- * @property {string} name Nombre principal de la ciudad.
- * @property {string} [country] País de la ciudad.
- * @property {string | null} [admin1] Región o departamento.
- * @property {string} [label] Etiqueta legible, por ejemplo:
+ * @property {string} id Identificador único entregado por el geocodificador
+ * @property {string} name Nombre principal de la ciudad
+ * @property {string} [country] País de la ciudad
+ * @property {string | null} [admin1] Región o depto
+ * @property {string} [label] Etiqueta legible, x ejemplo:
  * "Bogotá, Bogotá D.C., Colombia".
  */
 
 /**
- * Evento emitido cuando la persona selecciona una ciudad guardada.
+ * Evento emitido cuando la persona selecciona una ciudad guardada
  *
  * @typedef {CustomEvent<{ city: SavedCity }>} CitySelectEvent
  */
 
 /**
- * Evento emitido cuando la persona elimina una ciudad guardada.
+ * Evento emitido cuando la persona elimina una ciudad  q ya estaba guardada
  *
  * @typedef {CustomEvent<{ city: SavedCity, cityId: string }>} CityRemoveEvent
  */
 
 /**
- * Lista de ciudades guardadas de ClimaVivo.
+ * Lista de ciudades guardadas de la app
  *
  * El componente recibe ciudades desde <weather-dashboard> y emite eventos
- * para informar interacciones del usuario.
+ * para informar las interacciones del usuario
  *
- * No hace fetch, no maneja localStorage y no modifica el estado global.
- * <weather-dashboard> debe ser el dueño de favoritos y persistencia.
+ * No hace fetch, no maneja localStorage y no modifica el estado global
+ * <weather-dashboard> es quien maneja favoritos y persistencia
  *
  * @element saved-cities
  * @fires city-select
@@ -46,7 +46,7 @@ export class SavedCities extends LitElement {
    *
    * <saved-cities .cities=${this._favorites}></saved-cities>
    *
-   * Esto es importante porque se pasa un array real de JavaScript.
+   *  ((se pasa un array real de Js))
    */
   static properties = {
     cities: { type: Array },
@@ -55,7 +55,7 @@ export class SavedCities extends LitElement {
   };
 
   /**
-   * Estilos encapsulados mediante Shadow DOM.
+   * Estilos encapsulados mediante ShadowDOM
    */
   static styles = unsafeCSS(styles);
 
@@ -77,7 +77,7 @@ export class SavedCities extends LitElement {
     this.selectedCityId = '';
 
     /**
-     * Permite deshabilitar acciones mientras la aplicación carga datos.
+     * Permite deshabilitar acciones mientras la aplicación carga datos
      *
      * @type {boolean}
      */
@@ -88,7 +88,7 @@ export class SavedCities extends LitElement {
    * Renderiza el componente.
    *
    * Muestra un estado vacío si no hay ciudades guardadas y una lista
-   * interactiva si el array `cities` tiene elementos.
+   * interactiva si el array DE cities tiene elementos
    *
    * @returns {import('lit').TemplateResult}
    */
@@ -117,7 +117,7 @@ export class SavedCities extends LitElement {
   }
 
   /**
-   * Renderiza el estado vacío cuando aún no existen favoritas.
+   * Renderiza el estado vacío cuando aún no existen ciudades favs
    *
    * @returns {import('lit').TemplateResult}
    */
@@ -142,7 +142,7 @@ export class SavedCities extends LitElement {
   }
 
   /**
-   * Renderiza una lista de ciudades guardadas.
+   * Renderiza una lista de ciudades guardadas
    *
    * @returns {import('lit').TemplateResult}
    */
@@ -200,10 +200,10 @@ export class SavedCities extends LitElement {
   }
 
   /**
-   * Obtiene la ciudad asociada al botón que disparó el evento.
+   * Obtiene la ciudad asociada al botón que disparó el evento
    *
-   * @param {Event} event Evento generado por un botón.
-   * @returns {SavedCity | undefined} Ciudad encontrada.
+   * @param {Event} event Evento generado por un botón
+   * @returns {SavedCity | undefined} Ciudad encontrada
    */
   _getCityFromEvent(event) {
     const button = event.currentTarget;
@@ -218,7 +218,7 @@ export class SavedCities extends LitElement {
   }
 
   /**
-   * Emite `city-select` para solicitar que el dashboard consulte una ciudad.
+   * Emite "city-select" para solicitar que el dashboard consulte una ciudad
    *
    * @param {MouseEvent} event Evento click sobre una ciudad guardada.
    * @returns {void}
@@ -244,12 +244,12 @@ export class SavedCities extends LitElement {
   }
 
   /**
-   * Emite `city-remove` para solicitar que el dashboard elimine una ciudad.
+   * Emite "city-remove" para solicitar que el dashboard elimine una ciudad
    *
    * stopPropagation evita que el click del botón eliminar active también
-   * la selección de la ciudad.
+   * la selección de la ciudad
    *
-   * @param {MouseEvent} event Evento click sobre el botón eliminar.
+   * @param {MouseEvent} event Evento click sobre el botón eliminar
    * @returns {void}
    */
   _handleCityRemove(event) {
@@ -278,20 +278,20 @@ export class SavedCities extends LitElement {
   }
 
   /**
-   * Genera texto secundario para una ciudad.
+   * Genera texto secundario para una ciudad
    *
-   * @param {SavedCity} city Ciudad guardada.
-   * @returns {string} Región y/o país.
+   * @param {SavedCity} city Ciudad guardada
+   * @returns {string} Región y/o país
    */
   _getCityMeta(city) {
     return [city.admin1, city.country].filter(Boolean).join(', ') || 'Ubicación guardada';
   }
 
   /**
-   * Genera una etiqueta completa y legible.
+   * Genera una etiqueta completa y legible
    *
-   * @param {SavedCity} city Ciudad guardada.
-   * @returns {string} Etiqueta de ciudad.
+   * @param {SavedCity} city Ciudad guardada
+   * @returns {string} Etiqueta de ciudad
    */
   _getCityLabel(city) {
     return city.label || [
@@ -304,7 +304,7 @@ export class SavedCities extends LitElement {
 
 /**
  * Evita errores por registrar dos veces el custom element durante
- * desarrollo con Vite o pruebas con Vitest.
+ * desarrollo con Vite
  */
 if (!customElements.get('saved-cities')) {
   customElements.define('saved-cities', SavedCities);
