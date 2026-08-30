@@ -3,6 +3,7 @@ import { environment } from '../config/environment.js';
 const currentVariables = [
   'temperature_2m',
   'apparent_temperature',
+  'relative_humidity_2m', //agregué esta 
   'wind_speed_10m',
   'weather_code',
   'is_day'
@@ -57,17 +58,32 @@ export const buildForecastUrl = (city, unit) => {
   return addApiKey(url);
 };
 
+/**
+ * Traduce el código meteorológico de Open-Meteo a datos de presentación.
+ *
+ * Bueno y aqui iconKey ya usa valores compatibles con los estilos de current-weather
+ * y forecast-strip.
+ *
+ * @param {number} weatherCode Código WMO entregado por Open-Meteo.
+ * @param {boolean} [isDay=true] Indica si el clima actual ocurre de día.
+ * @returns {{ condition: string, iconKey: string }}
+ */
 export const describeWeatherCode = (weatherCode, isDay = true) => {
+  const clearIcon = isDay ? 'clear-day' : 'clear-night';
+  const partlyCloudyIcon = isDay
+    ? 'partly-cloudy-day'
+    : 'partly-cloudy-night';
+
   const conditions = {
-    0: isDay ? ['Despejado', 'clear-day'] : ['Despejado', 'clear-night'],
-    1: isDay ? ['Mayormente despejado', 'partly-cloudy-day'] : ['Mayormente despejado', 'partly-cloudy-night'],
-    2: ['Parcialmente nublado', 'partly-cloudy'],
+    0: ['Despejado', clearIcon],
+    1: ['Mayormente despejado', partlyCloudyIcon],
+    2: ['Parcialmente nublado', partlyCloudyIcon],
     3: ['Nublado', 'cloudy'],
     45: ['Niebla', 'fog'],
     48: ['Niebla con escarcha', 'fog'],
-    51: ['Llovizna ligera', 'drizzle'],
-    53: ['Llovizna moderada', 'drizzle'],
-    55: ['Llovizna intensa', 'drizzle'],
+    51: ['Llovizna ligera', 'rain'],
+    53: ['Llovizna moderada', 'rain'],
+    55: ['Llovizna intensa', 'rain'],
     61: ['Lluvia ligera', 'rain'],
     63: ['Lluvia moderada', 'rain'],
     65: ['Lluvia intensa', 'rain'],
@@ -77,12 +93,16 @@ export const describeWeatherCode = (weatherCode, isDay = true) => {
     80: ['Chubascos ligeros', 'rain'],
     81: ['Chubascos moderados', 'rain'],
     82: ['Chubascos intensos', 'rain'],
-    95: ['Tormenta', 'thunderstorm'],
-    96: ['Tormenta con granizo', 'thunderstorm'],
-    99: ['Tormenta con granizo intenso', 'thunderstorm']
+    95: ['Tormenta', 'storm'],
+    96: ['Tormenta con granizo', 'storm'],
+    99: ['Tormenta con granizo intenso', 'storm']
   };
 
-  const [condition, iconKey] = conditions[weatherCode] ?? ['Condición desconocida', 'unknown'];
+  const [condition, iconKey] = conditions[weatherCode] ?? [
+    'Condición desconocida',
+    'unknown'
+  ];
+
   return { condition, iconKey };
 };
 
@@ -142,23 +162,39 @@ const normalizeForecast = (daily) => {
   });
 };
 
+/**
+ * Convierte el objeto current de Open-Meteo a lo q consume
+ * <current-weather>.
+ *
+ * @param {object} current Datos crudos de Open-Meteo.
+ * @returns {object} Datos meteorológicos normalizados.
+ * @throws {WeatherApiError} Si faltan datos esenciales
+ */
 const normalizeCurrentWeather = (current) => {
   const requiredValues = [
     current?.temperature_2m,
     current?.apparent_temperature,
+    current?.relative_humidity_2m, 
     current?.wind_speed_10m,
     current?.weather_code,
     current?.is_day
   ];
 
   if (!requiredValues.every(Number.isFinite)) {
-    throw new WeatherApiError('El clima actual recibido está incompleto. Intenta de nuevo.');
+    throw new WeatherApiError(
+      'El clima actual recibido está incompleto. Intenta de nuevo.'
+    );
   }
 
-  const weather = describeWeatherCode(current.weather_code, current.is_day === 1);
+  const weather = describeWeatherCode(
+    current.weather_code,
+    current.is_day === 1
+  );
+
   return {
     temperature: current.temperature_2m,
     apparentTemperature: current.apparent_temperature,
+    humidity: current.relative_humidity_2m, //le agregué esta
     windSpeed: current.wind_speed_10m,
     weatherCode: current.weather_code,
     isDay: current.is_day === 1,

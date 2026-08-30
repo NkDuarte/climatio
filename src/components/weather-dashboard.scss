@@ -1,81 +1,273 @@
 :host {
   display: block;
-  color: #17324d;
+  min-height: 100vh;
+  color: var(--text, #eef6ff);
+  background: transparent;
 }
 
 .dashboard {
-  max-width: 58rem;
+  position: relative;
+  isolation: isolate;
+  max-width: 76rem;
   margin: 0 auto;
-  padding: 2rem;
-  border: 1px solid #b8d8d8;
-  border-radius: 1rem;
-  background: #f5fbf9;
-  box-shadow: 0 1rem 2.5rem rgb(23 50 77 / 0.12);
+  padding: clamp(1rem, 3vw, 2.5rem);
+}
+
+.dashboard__atmosphere {
+  position: fixed;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 74% 5%, rgb(87 173 225 / 0.14), transparent 44%),
+    linear-gradient(155deg, #071828 0%, #0c273c 52%, #061420 100%);
+  transition: background 1.2s ease;
+}
+
+.dashboard__atmosphere::after {
+  position: absolute;
+  top: -20rem;
+  right: -16rem;
+  width: 48rem;
+  height: 48rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(153 218 255 / 0.16), transparent 67%);
+  content: '';
+  opacity: 0.65;
+}
+
+.dashboard__sun,
+.dashboard__moon,
+.dashboard__cloud,
+.dashboard__rain,
+.dashboard__snow,
+.dashboard__lightning {
+  position: absolute;
+  display: none !important;
+}
+
+.dashboard__sun {
+  top: 7rem;
+  right: 10%;
+  width: 12rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #ffdc70;
+  box-shadow: 0 0 6rem 2rem rgb(255 205 90 / 0.25);
+  opacity: 0.82;
+}
+
+.dashboard__moon {
+  top: 6rem;
+  right: 12%;
+  width: 8rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #e8f2ff;
+  box-shadow: inset -2rem -0.7rem #93aac2, 0 0 4rem rgb(224 240 255 / 0.14);
+  opacity: 0.78;
+}
+
+.dashboard__cloud {
+  width: 18rem;
+  height: 4.5rem;
+  border-radius: 9rem;
+  background: linear-gradient(180deg, rgb(211 229 239 / 0.18), rgb(124 155 176 / 0.04));
+  filter: blur(1.5px);
+}
+
+.dashboard__cloud::before,
+.dashboard__cloud::after {
+  position: absolute;
+  bottom: 2rem;
+  border-radius: 50%;
+  background: inherit;
+  content: '';
+}
+
+.dashboard__cloud::before {
+  left: 3rem;
+  width: 5.8rem;
+  height: 5.8rem;
+}
+
+.dashboard__cloud::after {
+  right: 4rem;
+  width: 7.2rem;
+  height: 7.2rem;
+}
+
+.dashboard__cloud--one {
+  top: 4rem;
+  left: -9rem;
+}
+
+.dashboard__cloud--two {
+  top: 23rem;
+  right: -11rem;
+  scale: 0.75;
+  opacity: 0.7;
+}
+
+.dashboard__rain {
+  inset: -4rem 0 0;
+  background:
+    linear-gradient(90deg, rgb(8 30 48 / 0.32), transparent 28%, transparent 72%, rgb(8 30 48 / 0.32)),
+    repeating-linear-gradient(112deg, transparent 0 5.7rem, rgb(155 219 255 / 0.15) 5.78rem 5.86rem, transparent 5.94rem 11.5rem);
+  mask-image: linear-gradient(90deg, rgb(0 0 0 / 0.9), transparent 34%, transparent 66%, rgb(0 0 0 / 0.9));
+  opacity: 0.72;
+}
+
+.dashboard__snow {
+  inset: 0;
+  background-image:
+    radial-gradient(circle, rgb(247 253 255 / 0.75) 0 0.15rem, transparent 0.18rem),
+    radial-gradient(circle, rgb(247 253 255 / 0.5) 0 0.1rem, transparent 0.13rem);
+  background-position: 0 0, 2.2rem 1.4rem;
+  background-size: 4.2rem 4.2rem, 5.6rem 5.6rem;
+  opacity: 0.5;
+}
+
+.dashboard__lightning {
+  top: 0;
+  right: 18%;
+  width: 0.18rem;
+  height: 100%;
+  background: #e8f6ff;
+  box-shadow: 0 0 4rem 1.5rem rgb(132 203 255 / 0.65);
+  opacity: 0;
+}
+
+.dashboard > :not(.dashboard__atmosphere) {
+  position: relative;
+  z-index: 1;
+}
+
+.dashboard--clear-day .dashboard__atmosphere {
+  background:
+    radial-gradient(ellipse at 76% 8%, rgb(255 211 111 / 0.34), transparent 43%),
+    linear-gradient(155deg, #0b2b47 0%, #17618b 50%, #0d3455 100%);
+}
+
+.dashboard--clear-night .dashboard__atmosphere {
+  background:
+    radial-gradient(ellipse at 76% 8%, rgb(193 220 255 / 0.16), transparent 40%),
+    linear-gradient(155deg, #07142b 0%, #172e54 55%, #050f1d 100%);
+}
+
+.dashboard--cloudy .dashboard__atmosphere {
+  background:
+    radial-gradient(ellipse at 18% 0%, rgb(189 215 229 / 0.12), transparent 42%),
+    linear-gradient(155deg, #152d3e 0%, #39576a 50%, #132b3d 100%);
+}
+
+.dashboard--fog .dashboard__atmosphere {
+  background:
+    radial-gradient(ellipse at 18% 6%, rgb(220 235 239 / 0.16), transparent 48%),
+    linear-gradient(155deg, #2b4454 0%, #6c8894 50%, #294555 100%);
+}
+
+.dashboard--rain .dashboard__atmosphere {
+  background:
+    radial-gradient(ellipse at 72% 5%, rgb(121 184 225 / 0.12), transparent 44%),
+    linear-gradient(155deg, #0d2235 0%, #34546a 50%, #091a2a 100%);
+}
+
+.dashboard--thunderstorm .dashboard__atmosphere {
+  background:
+    radial-gradient(ellipse at 75% 4%, rgb(139 192 255 / 0.11), transparent 38%),
+    linear-gradient(155deg, #050c15 0%, #1b3149 52%, #050d16 100%);
+}
+
+.dashboard--snow .dashboard__atmosphere {
+  background:
+    radial-gradient(ellipse at 75% 5%, rgb(233 248 255 / 0.18), transparent 45%),
+    linear-gradient(155deg, #25485f 0%, #708fa2 50%, #24445b 100%);
 }
 
 .dashboard__header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 2rem;
-  margin-bottom: 2rem;
+  gap: 1.5rem;
+  margin-bottom: 2.25rem;
 }
 
 .dashboard__eyebrow {
   margin: 0 0 0.5rem;
-  color: #237b79;
+  color: var(--accent, #78c8ff);
   font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 h1 {
   margin: 0;
-  color: #17324d;
-  font-size: clamp(2rem, 5vw, 4rem);
-  line-height: 0.95;
+  color: var(--text, #eef6ff);
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  letter-spacing: 0;
+  line-height: 1;
 }
 
 .dashboard__header p:last-child {
   margin: 0.75rem 0 0;
-  color: #527080;
+  color: var(--muted, #8fa7ba);
 }
 
 .dashboard__status {
-  min-height: 3rem;
-  margin-top: 1.5rem;
+  min-height: 0;
+  margin: 1rem 0;
 }
 
-.status,
-.selected-city {
+.status {
   margin: 0;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  background: #e4f1ef;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--line, #28465c);
+  border-radius: 0.4rem;
+  background: var(--surface-raised, #102a40);
+  color: var(--muted, #8fa7ba);
 }
 
 .status--loading {
-  color: #237b79;
+  border-color: var(--accent-strong, #2186d1);
+  color: var(--accent, #78c8ff);
 }
 
 .status--error {
-  color: #a53d32;
-  background: #fbe9e5;
+  border-color: var(--danger, #ff7078);
+  background: var(--danger-surface, #501d29);
+  color: #ffe8e9;
 }
 
-.selected-city {
-  font-weight: 700;
+.dashboard__weather {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .dashboard__atmosphere::after {
+    animation: dashboard-atmosphere-drift 16s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes dashboard-atmosphere-drift {
+  to {
+    opacity: 0.9;
+    transform: translate3d(-4rem, 3rem, 0) scale(1.06);
+  }
 }
 
 @media (max-width: 38rem) {
   .dashboard {
-    padding: 1.25rem;
+    padding: 1rem;
   }
 
   .dashboard__header {
     flex-direction: column;
-    gap: 1.25rem;
+    align-items: stretch;
+    gap: 1rem;
   }
 
  .dashboard__saved-cities {

@@ -60,7 +60,12 @@ describe('weather-dashboard', () => {
 
     expect(dashboard.city).toBe('Madrid');
     expect(dashboard._currentWeather.temperature).toBe(22);
-    expect(dashboard.shadowRoot.textContent).toContain('Madrid');
+    expect(
+      dashboard.shadowRoot.querySelector('current-weather').city.name
+    ).toBe('Madrid');
+    expect(
+      dashboard.shadowRoot.querySelector('.dashboard').classList.contains('dashboard--cloudy')
+    ).toBe(true);
   });
 
   it('actualiza la unidad al recibir unit-change', async () => {

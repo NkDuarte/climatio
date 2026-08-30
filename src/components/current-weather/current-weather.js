@@ -267,7 +267,18 @@ export class CurrentWeather extends LitElement {
             class="current-weather__icon current-weather__icon--${iconKey} ${dayClass}"
             role="img"
             aria-label="${condition}"
-          ></div>
+          >
+            <span class="current-weather__glow" aria-hidden="true"></span>
+            <span class="current-weather__cloud current-weather__cloud--rear" aria-hidden="true"></span>
+            <span class="current-weather__cloud current-weather__cloud--front" aria-hidden="true"></span>
+            <span class="current-weather__rain" aria-hidden="true">
+              <span></span><span></span><span></span><span></span>
+            </span>
+            <span class="current-weather__bolt" aria-hidden="true"></span>
+            <span class="current-weather__snow" aria-hidden="true">
+              <span></span><span></span><span></span>
+            </span>
+          </div>
 
           <div class="current-weather__temperature-group">
             <p class="current-weather__temperature">
@@ -282,7 +293,7 @@ export class CurrentWeather extends LitElement {
 
         <dl class="current-weather__details">
           <div>
-            <dt>Sensación</dt>
+            <dt>Sensación </dt>
             <dd>
               ${this._formatTemperature(this.weather.apparentTemperature)}
             </dd>
