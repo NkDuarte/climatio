@@ -259,14 +259,27 @@ h1 {
   }
 }
 
+/**
+ * Espacio visual entre el bloque meteorológico y las ciudades guardadas
+ */
+.dashboard__saved-cities {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.dashboard__weather {
+  display: grid;
+  gap: 1.5rem;
+}
+
 @media (max-width: 38rem) {
   .dashboard {
-    padding: 1rem;
+    padding: 1.25rem;
   }
 
   .dashboard__header {
     flex-direction: column;
     align-items: stretch;
-    gap: 1rem;
+    gap: 1.25rem;
   }
 }

@@ -4,7 +4,15 @@ import './city-search/city-search.js';
 import './unit-selector/unit-selector.js';
 import './current-weather/current-weather.js'; // faltaba el import de clima actual
 import './forecast-strip/forecast-strip.js'; // faltaba el import d pronóstico
+import './saved-cities/saved-cities.js'; //último: lista de ciudades favoritas
 import styles from './weather-dashboard.scss?inline';
+/**
+ * Add: Llave usada para guardar favoritas en localStorage
+ *
+ * El dashboard es dueño de persistencia y estado global
+ * ercordatorio: saved-cities solo recibe datos y emite eventos
+ */
+const FAVORITES_STORAGE_KEY = 'climavivo:favorites';
 
 export class WeatherDashboard extends LitElement {
   static properties = {
@@ -15,7 +23,8 @@ export class WeatherDashboard extends LitElement {
     _error: { state: true },
     _selectedCity: { state: true },
     _currentWeather: { state: true },
-    _forecast: { state: true }
+    _forecast: { state: true },
+    _favorites: { state: true } //agregué favorites 
   };
 
   static styles = unsafeCSS(styles);
@@ -30,6 +39,7 @@ export class WeatherDashboard extends LitElement {
     this._selectedCity = null;
     this._currentWeather = null;
     this._forecast = [];
+    this._favorites = this._readFavorites(); //agregué este (para recuperar las ciudades guardadas del nav)
     this._activeRequest = null;
   }
 
@@ -41,6 +51,9 @@ export class WeatherDashboard extends LitElement {
         class="dashboard dashboard--${weatherScene}"
         @city-search=${this._handleCitySearch}
         @unit-change=${this._handleUnitChange}
+        @favorite-toggle=${this._handleFavoriteToggle}  
+        @city-select=${this._handleCitySelect}
+        @city-remove=${this._handleCityRemove}
       >
         <div class="dashboard__atmosphere" aria-hidden="true">
           <span class="dashboard__sun"></span>
@@ -122,6 +135,7 @@ export class WeatherDashboard extends LitElement {
                         .city=${this._selectedCity}
                         .weather=${this._currentWeather}
                         .unit=${this.unit}
+                        .isFavorite=${this._isFavorite(this._selectedCity)} 
                         ?disabled=${this._isLoading}
                       ></current-weather>
                     `
@@ -139,6 +153,26 @@ export class WeatherDashboard extends LitElement {
               </section>
             `
           : ''}
+
+        <!--
+        Agregué: integración de ciudades guardadas
+        saved-cities siempre aparece.
+
+        Si no hay favoritas, muestra su estado vacío.
+        Si existen favoritas, permite seleccionarlas o eliminarlas.
+        saved-cities no hace fetch ni localStorage.
+        El dashboard le pasa favoritas y escucha sus eventos.
+        -->
+        <aside
+          class="dashboard__saved-cities"
+          aria-label="Ciudades guardadas"
+        >
+          <saved-cities
+            .cities=${this._favorites}
+            .selectedCityId=${this._selectedCity?.id ?? ''}
+            ?disabled=${this._isLoading}
+          ></saved-cities>
+        </aside>
       </section>
     `;
   }
@@ -187,6 +221,133 @@ export class WeatherDashboard extends LitElement {
 
     if (this._selectedCity) {
       this._loadWeather(this._selectedCity);
+    }
+  }
+
+    /**
+   * Guarda o elimina la ciudad actual de favoritas.
+   *
+   * current-weather emite favorite-toggle, pero no administra
+   * localStorage ni el estado global. Esa responsabilidad queda aquí.
+   *
+   * @param {CustomEvent<{ city?: object }>} event Evento favorite-toggle.
+   * @returns {void}
+   */
+  _handleFavoriteToggle(event) {
+    const city = event.detail?.city ?? this._selectedCity;
+
+    if (!city?.id) {
+      return;
+    }
+
+    if (this._isFavorite(city)) {
+      this._favorites = this._favorites.filter(
+        (favorite) => favorite.id !== city.id
+      );
+    } else {
+      this._favorites = [...this._favorites, city];
+    }
+
+    this._persistFavorites();
+  }
+
+  /**
+   * Consulta el clima de una ciudad seleccionada desde saved-cities.
+   *
+   * La ciudad ya viene normalizada, por eso _loadWeather puede recibirla
+   * directamente sin repetir geocodificación c:
+   *
+   * @param {CustomEvent<{ city: object }>} event Evento city-select.
+   * @returns {void}
+   */
+  _handleCitySelect(event) {
+    const city = event.detail?.city;
+
+    if (!city?.id) {
+      return;
+    }
+
+    this.city = city.name;
+    this._loadWeather(city);
+  }
+
+  /**
+   * Elimina una ciudad de la lista de favoritas.
+   *
+   * @param {CustomEvent<{ cityId: string }>} event Evento city-remove.
+   * @returns {void}
+   */
+  _handleCityRemove(event) {
+    const cityId = event.detail?.cityId;
+
+    if (!cityId) {
+      return;
+    }
+
+    this._favorites = this._favorites.filter(
+      (favorite) => favorite.id !== cityId
+    );
+
+    this._persistFavorites();
+  }
+
+  /**
+   * Verifica si una ciudad ya se encuentra guardada.
+   *
+   * @param {object | null} city Ciudad por comprobar.
+   * @returns {boolean} True si está dentro de favoritas.
+   */
+  _isFavorite(city) {
+    if (!city?.id) {
+      return false;
+    }
+
+    return this._favorites.some(
+      (favorite) => favorite.id === city.id
+    );
+  }
+
+  /**
+   * Lee favoritas desde localStorage.
+   *
+   * Si no existen datos, localStorage está bloqueado o el JSON es inválido,
+   * devuelve un array vacío para que la app siga funcionando.
+   *
+   * @returns {object[]} Lista de ciudades favoritas.
+   */
+  _readFavorites() {
+    try {
+      const storedFavorites = localStorage.getItem(
+        FAVORITES_STORAGE_KEY
+      );
+
+      if (!storedFavorites) {
+        return [];
+      }
+
+      const parsedFavorites = JSON.parse(storedFavorites);
+
+      return Array.isArray(parsedFavorites)
+        ? parsedFavorites.filter((city) => city?.id)
+        : [];
+    } catch {
+      return [];
+    }
+  }
+
+  /**
+   * Persiste las favoritas actuales en localStorage.
+   *
+   * @returns {void}
+   */
+  _persistFavorites() {
+    try {
+      localStorage.setItem(
+        FAVORITES_STORAGE_KEY,
+        JSON.stringify(this._favorites)
+      );
+    } catch {
+      // La app sigue funcionando aunque localStorage esté bloqueado.
     }
   }
 
