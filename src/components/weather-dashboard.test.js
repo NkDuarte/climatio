@@ -17,6 +17,7 @@ const forecastResponse = {
   current: {
     temperature_2m: 22,
     apparent_temperature: 21,
+    relative_humidity_2m: 57,
     wind_speed_10m: 10,
     weather_code: 2,
     is_day: 1
@@ -30,6 +31,7 @@ const forecastResponse = {
 };
 
 beforeEach(() => {
+  window.localStorage.clear();
   vi.stubGlobal('fetch', vi.fn((url) => Promise.resolve({
     ok: true,
     status: 200,
@@ -39,6 +41,7 @@ beforeEach(() => {
 
 afterEach(() => {
   document.body.innerHTML = '';
+  window.localStorage.clear();
   vi.unstubAllGlobals();
 });
 
@@ -84,5 +87,38 @@ describe('weather-dashboard', () => {
     await dashboard.updateComplete;
 
     expect(dashboard.unit).toBe('fahrenheit');
+  });
+
+  it('guarda y elimina favoritas a partir de los eventos públicos', async () => {
+    const dashboard = document.createElement('weather-dashboard');
+    document.body.append(dashboard);
+
+    await vi.waitFor(() => expect(dashboard._selectedCity?.name).toBe('Madrid'));
+
+    const city = dashboard._selectedCity;
+    dashboard.shadowRoot.querySelector('current-weather').dispatchEvent(
+      new CustomEvent('favorite-toggle', {
+        detail: { city },
+        bubbles: true,
+        composed: true
+      })
+    );
+
+    await dashboard.updateComplete;
+
+    expect(dashboard._favorites).toEqual([city]);
+    expect(dashboard.shadowRoot.querySelector('saved-cities').cities).toEqual([city]);
+
+    dashboard.shadowRoot.querySelector('saved-cities').dispatchEvent(
+      new CustomEvent('city-remove', {
+        detail: { cityId: city.id },
+        bubbles: true,
+        composed: true
+      })
+    );
+
+    await dashboard.updateComplete;
+
+    expect(dashboard._favorites).toEqual([]);
   });
 });
