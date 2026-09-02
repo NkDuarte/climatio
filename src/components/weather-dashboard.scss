@@ -218,7 +218,7 @@ h1 {
 
 .dashboard__status {
   min-height: 0;
-  margin: 1rem 0;
+  margin-bottom: 1rem;
 }
 
 .status {
@@ -241,11 +241,6 @@ h1 {
   color: #ffe8e9;
 }
 
-.dashboard__weather {
-  display: grid;
-  gap: 1rem;
-}
-
 @media (prefers-reduced-motion: no-preference) {
   .dashboard__atmosphere::after {
     animation: dashboard-atmosphere-drift 16s ease-in-out infinite alternate;
@@ -259,12 +254,22 @@ h1 {
   }
 }
 
-/**
- * Espacio visual entre el bloque meteorológico y las ciudades guardadas
- */
-.dashboard__saved-cities {
-  width: 100%;
+.dashboard__content {
+  display: grid;
+  grid-template-columns: minmax(0, 9fr) minmax(14rem, 3fr);
+  gap: 1rem;
+  align-items: start;
   margin-top: 1rem;
+}
+
+.dashboard__main {
+  min-width: 0;
+}
+
+.dashboard__saved-cities {
+  position: sticky;
+  top: 1rem;
+  min-width: 0;
 }
 
 .dashboard__weather {
@@ -282,4 +287,18 @@ h1 {
     align-items: stretch;
     gap: 1.25rem;
   }
+
+  .dashboard__content {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard__saved-cities {
+    position: static;
+  }
+}
+
+.status--offline {
+  border-color: #d3a64f;
+  background: #3d301b;
+  color: #ffe6af;
 }

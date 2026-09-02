@@ -93,9 +93,9 @@ export const describeWeatherCode = (weatherCode, isDay = true) => {
     80: ['Chubascos ligeros', 'rain'],
     81: ['Chubascos moderados', 'rain'],
     82: ['Chubascos intensos', 'rain'],
-    95: ['Tormenta', 'storm'],
-    96: ['Tormenta con granizo', 'storm'],
-    99: ['Tormenta con granizo intenso', 'storm']
+    95: ['Tormenta', 'thunderstorm'],
+    96: ['Tormenta con granizo', 'thunderstorm'],
+    99: ['Tormenta con granizo intenso', 'thunderstorm']
   };
 
   const [condition, iconKey] = conditions[weatherCode] ?? [

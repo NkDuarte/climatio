@@ -22,6 +22,7 @@ const forecastResponse = {
   current: {
     temperature_2m: 22,
     apparent_temperature: 21,
+    relative_humidity_2m: 57,
     wind_speed_10m: 10,
     weather_code: 2,
     is_day: 1

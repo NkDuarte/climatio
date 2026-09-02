@@ -1,10 +1,11 @@
 import { LitElement, html, unsafeCSS } from 'lit';
 import { loadWeatherForCity } from '../services/open-meteo.js';
+import { loadPreferences, savePreferences } from '../services/preferences.js';
 import './city-search/city-search.js';
 import './unit-selector/unit-selector.js';
-import './current-weather/current-weather.js'; // faltaba el import de clima actual
-import './forecast-strip/forecast-strip.js'; // faltaba el import d pronóstico
-import './saved-cities/saved-cities.js'; //último: lista de ciudades favoritas
+import './current-weather/current-weather.js';
+import './forecast-strip/forecast-strip.js';
+import './saved-cities/saved-cities.js';
 import styles from './weather-dashboard.scss?inline';
 /**
  * Add: Llave usada para guardar favoritas en localStorage
@@ -24,7 +25,8 @@ export class WeatherDashboard extends LitElement {
     _selectedCity: { state: true },
     _currentWeather: { state: true },
     _forecast: { state: true },
-    _favorites: { state: true } //agregué favorites 
+    _favorites: { state: true },
+    _isOffline: { state: true }
   };
 
   static styles = unsafeCSS(styles);
@@ -40,7 +42,31 @@ export class WeatherDashboard extends LitElement {
     this._currentWeather = null;
     this._forecast = [];
     this._favorites = this._readFavorites(); //agregué este (para recuperar las ciudades guardadas del nav)
+    this._isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
     this._activeRequest = null;
+    this._handleOnline = this._handleOnline.bind(this);
+    this._handleOffline = this._handleOffline.bind(this);
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+
+    const preferences = loadPreferences();
+    this.unit = preferences.unit;
+    this._favorites = preferences.favorites;
+    this._isOffline = !navigator.onLine;
+    window.addEventListener('online', this._handleOnline);
+    window.addEventListener('offline', this._handleOffline);
+
+    if (!this._isOffline) {
+      this._loadWeather(this.city);
+    }
+  }
+
+  updated(changedProperties) {
+    if (changedProperties.has('unit') || changedProperties.has('_favorites')) {
+      savePreferences({ unit: this.unit, favorites: this._favorites });
+    }
   }
 
   render() {
@@ -51,7 +77,7 @@ export class WeatherDashboard extends LitElement {
         class="dashboard dashboard--${weatherScene}"
         @city-search=${this._handleCitySearch}
         @unit-change=${this._handleUnitChange}
-        @favorite-toggle=${this._handleFavoriteToggle}  
+        @favorite-toggle=${this._handleFavoriteToggle}
         @city-select=${this._handleCitySelect}
         @city-remove=${this._handleCityRemove}
       >
@@ -83,96 +109,80 @@ export class WeatherDashboard extends LitElement {
           ?disabled=${this._isLoading}
         ></city-search>
 
-        <div class="dashboard__status" aria-live="polite">
-          ${this._isLoading
-            ? html`
-                <p class="status status--loading">
-                  Cargando información meteorológica...
-                </p>
-              `
-            : ''}
+        <div class="dashboard__content">
+          <div class="dashboard__main">
+            <div class="dashboard__status" aria-live="polite">
+              ${this._isLoading
+                ? html`
+                    <p class="status status--loading">
+                      Cargando información meteorológica...
+                    </p>
+                  `
+                : ''}
 
-          ${this._error
-            ? html`
-                <p class="status status--error" role="alert">
-                  ${this._error}
-                </p>
-              `
-            : ''}
+              ${this._error
+                ? html`
+                    <p class="status status--error" role="alert">
+                      ${this._error}
+                    </p>
+                  `
+                : ''}
 
-          ${!this._isLoading && !this._error && !this._selectedCity
-            ? html`
-                <p class="status">
-                  Busca una ciudad para consultar su pronóstico.
-                </p>
-              `
-            : ''}
+              ${this._isOffline
+                ? html`
+                    <p class="status status--offline" role="status">
+                      No hay conexión. Revisa tu red para actualizar el pronóstico.
+                    </p>
+                  `
+                : ''}
+
+              ${!this._isLoading && !this._error && !this._isOffline && !this._selectedCity
+                ? html`
+                    <p class="status">
+                      Busca una ciudad para consultar su pronóstico.
+                    </p>
+                  `
+                : ''}
+            </div>
+
+            ${this._selectedCity
+              ? html`
+                  <section
+                    class="dashboard__weather"
+                    aria-label="Información meteorológica"
+                  >
+                    ${this._currentWeather
+                      ? html`
+                          <current-weather
+                            .city=${this._selectedCity}
+                            .weather=${this._currentWeather}
+                            .unit=${this.unit}
+                            ?isFavorite=${this._isFavorite(this._selectedCity)}
+                            ?disabled=${this._isLoading}
+                          ></current-weather>
+                        `
+                      : ''}
+
+                    <forecast-strip
+                      .forecast=${this._forecast}
+                      .unit=${this.unit}
+                    ></forecast-strip>
+                  </section>
+                `
+              : ''}
+          </div>
+
+          <aside
+            class="dashboard__saved-cities"
+            aria-label="Ciudades guardadas"
+          >
+            <saved-cities
+              .cities=${this._favorites}
+              .selectedCityId=${this._selectedCity?.id ?? ''}
+              ?disabled=${this._isLoading}
+            ></saved-cities>
+          </aside>
         </div>
-
-        ${this._selectedCity
-          ? html`
-              <!--
-                ¿Q cambié? Sólo la integración de componentes faltantes. 
-
-                weather-dashboard sigue siendo dueño de:
-                - fetch;
-                - AbortController;
-                - estado global;
-                - ciudad seleccionada;
-                - clima actual;
-                - pronóstico.
-
-                Los componentes hijos solo reciben propiedades normalizadas
-                y se encargan de mostrar la información.
-              -->
-              <section
-                class="dashboard__weather"
-                aria-label="Información meteorológica"
-              >
-                ${this._currentWeather
-                  ? html`
-                      <current-weather
-                        .city=${this._selectedCity}
-                        .weather=${this._currentWeather}
-                        .unit=${this.unit}
-                        .isFavorite=${this._isFavorite(this._selectedCity)} 
-                        ?disabled=${this._isLoading}
-                      ></current-weather>
-                    `
-                  : ''}
-
-                <!--
-                  forecast-strip recibe el array normalizado _forecast
-                  Ahora ese componente usa forecast.map(...) internamente para
-                  renderizar una tarjeta en teoria x cada día del pronóstico
-                -->
-                <forecast-strip
-                  .forecast=${this._forecast}
-                  .unit=${this.unit}
-                ></forecast-strip>
-              </section>
-            `
-          : ''}
-
-        <!--
-        Agregué: integración de ciudades guardadas
-        saved-cities siempre aparece.
-
-        Si no hay favoritas, muestra su estado vacío.
-        Si existen favoritas, permite seleccionarlas o eliminarlas.
-        saved-cities no hace fetch ni localStorage.
-        El dashboard le pasa favoritas y escucha sus eventos.
-        -->
-        <aside
-          class="dashboard__saved-cities"
-          aria-label="Ciudades guardadas"
-        >
-          <saved-cities
-            .cities=${this._favorites}
-            .selectedCityId=${this._selectedCity?.id ?? ''}
-            ?disabled=${this._isLoading}
-          ></saved-cities>
-        </aside>
       </section>
     `;
   }
@@ -180,6 +190,36 @@ export class WeatherDashboard extends LitElement {
   _handleCitySearch(event) {
     this.city = event.detail.query;
     this._loadWeather(event.detail.query);
+  }
+
+  _handleFavoriteToggle(event) {
+    const { city } = event.detail;
+
+    if (!city?.id) {
+      return;
+    }
+
+    this._favorites = this._isFavorite(city)
+      ? this._favorites.filter((favorite) => favorite.id !== city.id)
+      : [...this._favorites, city];
+  }
+
+  _handleCitySelect(event) {
+    const { city } = event.detail;
+
+    if (city) {
+      this.city = city.name;
+      this._loadWeather(city);
+    }
+  }
+
+  _handleCityRemove(event) {
+    const { cityId } = event.detail;
+    this._favorites = this._favorites.filter((city) => city.id !== cityId);
+  }
+
+  _isFavorite(city) {
+    return this._favorites.some((favorite) => favorite.id === city?.id);
   }
 
   _getWeatherScene() {
@@ -353,10 +393,26 @@ export class WeatherDashboard extends LitElement {
 
   disconnectedCallback() {
     this._activeRequest?.abort();
+    window.removeEventListener('online', this._handleOnline);
+    window.removeEventListener('offline', this._handleOffline);
     super.disconnectedCallback();
   }
 
+  _handleOnline() {
+    this._isOffline = false;
+    this._loadWeather(this._selectedCity ?? this.city);
+  }
+
+  _handleOffline() {
+    this._isOffline = true;
+    this._activeRequest?.abort();
+  }
+
   async _loadWeather(city) {
+    if (this._isOffline) {
+      return;
+    }
+
     this._activeRequest?.abort();
 
     const request = new AbortController();
